@@ -1,0 +1,25 @@
+name: Daily Activity Log
+
+on:
+  schedule:
+    # Run every day at 08:00 UTC
+    - cron: '0 8 * * *'
+  workflow_dispatch:   # allow manual trigger
+
+jobs:
+  log-activity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Append daily check
+        run: |
+          mkdir -p activity
+          echo "$(date -u +%Y-%m-%d) — Automated daily check (project maintained)" >> activity/daily.log
+          git config user.name "Digvijay Parmar"
+          git config user.email "digvijayparmar777@gmail.com"
+          git add activity/daily.log
+          git commit -m "chore: daily maintenance log $(date -u +%Y-%m-%d)" || echo "No changes to commit"
+          git push
